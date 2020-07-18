@@ -105,8 +105,8 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 ##Support:
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
-###History: 
-2.2.0 - Initial commit to GitHub  
+###History:  
+2.2.1 - Initial commit to GitHub  
 2.1.6 - Fixed typo in documentation  
 2.1.5 - Fixed Linting and self-reported version  
 2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone  

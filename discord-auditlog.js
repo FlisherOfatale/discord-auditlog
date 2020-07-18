@@ -8,7 +8,7 @@ Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
-2.2.0 - Inmitial commit to GitHub
+2.2.1 - Inmitial commit to GitHub
 2.1.6 - Fixed typo in documentation
 2.1.5 - Fixed Linting and self-reported version
 2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone
@@ -27,7 +27,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.2.0"
+        version: "2.2.1"
     }
 
     const eventtype = {
