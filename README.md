@@ -4,7 +4,7 @@
 A simple Discord.js v12 Module that send join/leave/ban/unban and nickname/discriminator/username/avatar in custom channel.  
 
 This module have been Updated for DiscordJS V12 (tested under V12.2.0)  
-If you are still running V11, please install the version 1.9.4: "npm i discord-auditlog@1.9.4"  
+If you are still running V11, please install the version 1.9.4: "npm i discord-auditlog@discord.js-v11"  
 
 ## Installation
 This module assumes you already have a basic [Discord.js](https://discord.js.org/#/) bot setup.  
@@ -107,14 +107,5 @@ You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz
 
 ###History:  
 2.2.1 - Initial commit to GitHub  
-2.1.6 - Fixed typo in documentation  
-2.1.5 - Fixed Linting and self-reported version  
-2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone  
-2.1.3 - Bugfix: fixed race condition crash on updateMessage(Delete)  
-2.1.2 - Bugfix: fixed race condition crash on voiceUpdate  
-2.1.1 - Bugfix: fixed crash when message is modified or deleted in private message
-2.1.0 - Bugfix: Should not crash anymore when logging deleted message from banned user  
-2.0.2 - Added mode debugging capability for future development  
-2.0.1 - Fixed Readme.md with better description  
 2.0.0 - Initial DiscordJS V12 Compatibility  
-1.9.4 - Latest version compatible with DiscordJS V11, use "npm i discord-auditlog@1.9.4" to install  
+1.9.4 - Latest version compatible with DiscordJS V11, use "npm i discord-auditlog@discord.js-v11" to install  

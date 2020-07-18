@@ -1,14 +1,14 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.2.0
+Version: 2.2.2
 
 Todo:
 Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
-2.2.1 - Inmitial commit to GitHub
+2.2.2 - Inmitial commit to GitHub
 2.1.6 - Fixed typo in documentation
 2.1.5 - Fixed Linting and self-reported version
 2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone
@@ -27,7 +27,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.2.1"
+        version: "2.2.2"
     }
 
     const eventtype = {
@@ -49,7 +49,7 @@ module.exports = function (bot, options) {
     if (options && options.debugmode === true) debugmode = true
 
     const DiscordJSversion = require("discord.js").version
-    if (DiscordJSversion.substring(0, 2) !== "12") console.error("This version of discord-lobby only run on DiscordJS V12 and up, please run \"npm i discord-auditlog@1.9.4\" to install an older version")
+    if (DiscordJSversion.substring(0, 2) !== "12") console.error("This version of discord-lobby only run on DiscordJS V12 and up, please run \"npm i discord-auditlog@discord.js-v11\" to install an older version")
     if (DiscordJSversion.substring(0, 2) !== "12") return
 
     // Event Handlers
