@@ -1,14 +1,15 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.2.2
+Version: 2.2.3
 
 Todo:
 Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
-2.2.2 - Inmitial commit to GitHub
+2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
+2.2.2 - Initial commit to GitHub
 2.1.6 - Fixed typo in documentation
 2.1.5 - Fixed Linting and self-reported version
 2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone
@@ -27,7 +28,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.2.2"
+        version: "2.2.3"
     }
 
     const eventtype = {
@@ -642,7 +643,7 @@ ${newMessage.content.replace(/`/g, "'")}
         const channelname = (options[eventtype[movement]])
         if (channelname) {
             // define channel object
-            const channel = guild.channels.cache.find(val => val.name === channelname)
+            const channel = guild.channels.cache.find(val => val.name === channelname) || guild.channels.cache.find(val => val.id === channelname)
             if (channel) {
                 if (channel.permissionsFor(bot.user).has("SEND_MESSAGES") && channel.permissionsFor(bot.user).has("SEND_MESSAGES")) {
                     if (typeof msg === "object") {
