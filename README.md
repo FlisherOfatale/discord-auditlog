@@ -106,6 +106,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
+2.2.4 - Improved README.md format (OwenPotent)
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
 2.2.2 - Initial commit to GitHub 
 2.0.0 - Initial DiscordJS V12 Compatibility  
