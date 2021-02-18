@@ -1,14 +1,14 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.2.4
+Version: 2.2.5
 
 Todo:
 Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
-2.2.4 - Improved README.md format (OwenPotent)
+2.2.5 - Improved README.md format (OwenPotent)
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
 2.2.2 - Initial commit to GitHub
 2.1.6 - Fixed typo in documentation
