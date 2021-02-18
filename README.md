@@ -18,32 +18,32 @@ And you can follow the code  below to get started!
 
 ### Type of log being tracked
 Members movements: (default `channel: audit-log`)
-	Member Join the Server
-	Member Leave the Server
-	Member is Banned
-	Member is Unbanned
+- Member Join the Server
+- Member Leave the Server
+- Member is Banned
+- Member is Unbanned
 	
 Auditlog (default `channel: audit-log`)
-	Member Nickname Change
-	Member Update Avatar
-	Member Update Discriminator
-	Member Update Username
+- Member Nickname Change
+- Member Update Avatar
+- Member Update Discriminator
+- Member Update Username
 	
 Auditlog: (default `channel: audit-log`)
-	Member Role Changed (require `trackrole: true`)
+- Member Role Changed (require `trackrole: true`)
 		
 	
 Audit Message: (disabled by default)
-	Message Deleted
-	Message Updated
+- Message Deleted
+- Message Updated
 
 Voice Status Update: (disabled by default)
-	Member joining a Channel
-	Member leaving a Channel
-	Member switching a Channel
+- Member joining a Channel
+- Member leaving a Channel
+- Member switching a Channel
 
 		
-###Single-Server Usage without configuration (no server ID required in the configuration)
+### Single-Server Usage without configuration (no server ID required in the configuration)
 ```js
 const Auditlog = require("discord-auditlog");
 // will send all event to #audit-logs channel
@@ -51,7 +51,7 @@ const Auditlog = require("discord-auditlog");
 Auditlog(bot);
 ```
 
-###Single-Server Usage without configuration (no server ID required in the configuration)
+### Single-Server Usage without configuration (no server ID required in the configuration)
 ```js
 const Auditlog = require("discord-auditlog");
 // will send all event to #audit-logs channel
@@ -68,7 +68,7 @@ Auditlog(bot, {
 });
 ```
 
-###Multi-Servers Usage 
+### Multi-Servers Usage 
 ```js
 const AutoRole = require("discord-streaming");
 Auditlog(bot, {
@@ -91,21 +91,21 @@ Auditlog(bot, {
 });
 ```
 
-##Caveat:
--Can't track kick (will see a leave)  
+## Caveat:
+- Can't track kick (will see a leave)  
 
-###English:
+### English:
 This module was initialy coded for the Bucherons.ca gamers community, the Star Citizen Organization "Gardiens du LYS", Bar Citizen Coordinators and Bar Citizen Montreal Discord Servers.  
 
-###Français:
+### Français:
 Ce module a initiallement été conçu pour la communauté de gamers Bucherons.ca, la communauté gaming pour adultes au Québec, l'organisation Québecoise dans Star Citizen des Gardiens du Lys, les serveurs Discord de Bar Citizen Coordinators et Québec Orbital / Bar Citizen Montreal.  
   
 Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.barcitizen.sc, https://www.barcitizenmtl.com  
 
-##Support:
+## Support:
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
-###History:  
+### History:  
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
 2.2.2 - Initial commit to GitHub 
 2.0.0 - Initial DiscordJS V12 Compatibility  
