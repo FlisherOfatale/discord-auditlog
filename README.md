@@ -3,7 +3,7 @@
 # discord-auditlog
 A simple Discord.js v12 Module that send join/leave/ban/unban and nickname/discriminator/username/avatar in custom channel.  
 
-This module have been Updated for DiscordJS V12 (tested under V12.2.0)  
+This module have been Updated for DiscordJS V12 (tested under V12.5.2)  
 If you are still running V11, please install the version 1.9.4: "npm i discord-auditlog@discord.js-v11"  
 
 ## Installation
@@ -106,6 +106,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
+2.3.0 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
 2.2.5 - Improved README.md format (OwenPotent)  
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)  
 2.2.2 - Initial commit to GitHub  

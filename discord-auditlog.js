@@ -1,13 +1,14 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.2.5
+Version: 2.3.0
 
 Todo:
 Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
+2.3.0 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
 2.2.5 - Improved README.md format (OwenPotent)
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
 2.2.2 - Initial commit to GitHub
@@ -29,7 +30,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.2.4"
+        version: "2.3.0"
     }
 
     const eventtype = {
@@ -485,6 +486,7 @@ ${newMessage.content.replace(/`/g, "'")}
     // CHANNEL JOIN LEAVE SWITCH V12
     bot.on("voiceStateUpdate", (oldState, newState) => {
         if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate triggered`)
+        if (oldState.channel === null || newState.channel === null) return; 
         var oldChannelName
         var newChannelName
         var embed
