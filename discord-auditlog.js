@@ -1,7 +1,7 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.3.0
+Version: 2.3.1
 
 Todo:
 Add 2000 character handlings on msg related event
@@ -486,7 +486,7 @@ ${newMessage.content.replace(/`/g, "'")}
     // CHANNEL JOIN LEAVE SWITCH V12
     bot.on("voiceStateUpdate", (oldState, newState) => {
         if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate triggered`)
-        if (oldState.channel === null || newState.channel === null) return; 
+        if (oldState.channel === null && newState.channel === null) return; 
         var oldChannelName
         var newChannelName
         var embed

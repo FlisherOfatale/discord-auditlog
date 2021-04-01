@@ -106,7 +106,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
-2.3.0 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
+2.3.1 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
 2.2.5 - Improved README.md format (OwenPotent)  
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)  
 2.2.2 - Initial commit to GitHub  

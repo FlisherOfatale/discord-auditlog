@@ -1,13 +1,12 @@
 {
   "name": "discord-auditlog",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Simple Discord.js v12 Module that send somne custom audit logs to specifics channel",
   "main": "discord-auditlog.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "discord.js": "^12.5.2"
   },
   "keywords": [
     "Discord",
