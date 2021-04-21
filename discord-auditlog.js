@@ -1,14 +1,14 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.3.1
+Version: 2.3.2
 
 Todo:
 Add 2000 character handlings on msg related event
 Add kick detection capability when audit permission is available
 
 History:
-2.3.0 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
+2.3.2 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
 2.2.5 - Improved README.md format (OwenPotent)
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
 2.2.2 - Initial commit to GitHub
@@ -30,7 +30,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.3.0"
+        version: "2.3.2"
     }
 
     const eventtype = {
@@ -506,14 +506,14 @@ ${newMessage.content.replace(/`/g, "'")}
         if (newState && newState.channel && newState.channel.name) newchannelname = newState.channel.name
         if (newState && newState.channelID) newchanelid = newState.channelID
 
-        if (oldState.channelID) {
+        if (oldState.channelID && oldState.channel) {
             if (typeof oldState.channel.parent !== "undefined") {
                 oldChannelName = `${oldparentname}\n\t**${oldchannelname}**\n*${oldchanelid}*`
             } else {
                 oldChannelName = `-\n\t**${oldparentname}**\n*${oldchanelid}*`
             }
         }
-        if (newState.channelID) {
+        if (newState.channelID && newState.channel) {
             if (typeof newState.channel.parent !== "undefined") {
                 newChannelName = `${newparentname}\n\t**${newchannelname}**\n*${newchanelid}*`
             } else {
@@ -522,7 +522,7 @@ ${newMessage.content.replace(/`/g, "'")}
         }
 
         // JOINED V12
-        if (!oldState.channelID && newState.channelID) {
+        if (!oldState.channelID && newState.channelID && !oldState.channel && newState.channel) {
             if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:JOINED triggered`)
             embed = {
                 description: `<@${newState.member.user.id}> - *${newState.member.user.id}*`,
@@ -548,7 +548,7 @@ ${newMessage.content.replace(/`/g, "'")}
 
 
         // LEFT V12
-        if (oldState.channelID && !newState.channelID) {
+        if (oldState.channelID && !newState.channelID && oldState.channel && !newState.channel) {
             if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:LEFT triggered`)
             embed = {
                 url: newState.member.user.displayAvatarURL(),
@@ -573,7 +573,7 @@ ${newMessage.content.replace(/`/g, "'")}
 
 
         // SWITCH V12
-        if (oldState.channelID && newState.channelID) {
+        if (oldState.channelID && newState.channelID && oldState.channel && newState.channel) {
             // False positive check
             if (oldState.channelID !== newState.channelID) {
                 if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:SWITCH triggered`)
