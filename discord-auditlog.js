@@ -1,36 +1,21 @@
 /*
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
-Version: 2.3.2
+Other Contibutors: 
+2.4.0 - Adding Kick Detection Capability! (Huge thanks to DarylJG94)
+2.2.5 - Improved README.md format (OwenPotent)  
 
 Todo:
 Add 2000 character handlings on msg related event
-Add kick detection capability when audit permission is available
-
-History:
-2.3.2 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
-2.2.5 - Improved README.md format (OwenPotent)
-2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)
-2.2.2 - Initial commit to GitHub
-2.1.6 - Fixed typo in documentation
-2.1.5 - Fixed Linting and self-reported version
-2.1.4 - Bugfix: fixed race condition crash on updateMessage(Delete) when banning someone
-2.1.3 - Bugfix: fixed race condition crash on updateMessage(Delete)
-2.1.2 - Bugfix: fixed race condition crash on voiceUpdate
-2.1.1 - Bugfix: fixed crash when message is modified or deleted in private message
-2.1.0 - Bugfix: Should not crash anymore when logging deleted message from banned user
-2.0.2 - Added mode debugging capability for future development
-2.0.1 - Fixed Readme.md with better description
-2.0.0 - Initial DiscordJS V12 Compatibility
-1.9.4 - Latest version compatible with DiscordJS V11, use "npm i discord-auditlog@1.9.4" to install
 
 */
+
 
 module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.3.2"
+        version: "2.4.0"
     }
 
     const eventtype = {
@@ -77,6 +62,71 @@ module.exports = function (bot, options) {
         :messageUpdate:                MESSAGE UPDATE                16737792                https://cdn.discordapp.com/emojis/619328813381320735.png
 */
 
+
+
+
+    sleep = function (ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    KickCheck = async function (member) {
+
+        /**
+         *  Checks if the user has left or was kicked on their own decision 
+         * 
+         *      Produced for discord-auditlog
+         *      Produced By: DarylJG#9825
+         * 
+         */
+        return new Promise(async function (resolve, reject) {
+            try {
+
+                let guild = member.guild;
+
+                // Throw an error and reject the promise if the bot does not have sufficient permission
+                if (!member.guild.me.hasPermission('VIEW_AUDIT_LOG')) console.error `Discord-AuditLog - Missing Permission To View Audit Log`;
+                if (!member.guild.me.hasPermission('VIEW_AUDIT_LOG')) return resolve(false);
+
+                // Grab the last audit log entry for kicks
+                const AuditLogFetch = await guild.fetchAuditLogs({
+                    limit: 1,
+                    type: 'MEMBER_KICK',
+                });
+
+                // If No Result is found return a promise false
+                if (!AuditLogFetch) return resolve(false);
+                
+                // TODO: Check more than 1 entry, iteratie trought result to check if it was a kick.
+                const FirstEntry = AuditLogFetch.entries.first();
+
+
+                // If there is no entry made in the audit log in the last 5 seconds, resolve false as user was not kicked recently 
+                if (FirstEntry.createdTimestamp > (Date.now() - 6000) === false) return resolve(false);
+                const {
+                    executor,
+                    target
+                } = FirstEntry;
+
+                // If user was kicked return an object containing information
+                const Info = {
+                    "user": target.username,
+                    "id": target.id,
+                    "kickedby": executor.username,
+                    "reason": FirstEntry.reason,
+                }
+
+                return resolve(Info);
+
+            } catch (e) {
+
+                // Any unhandled issues above will reject the promise with an error
+                reject(e);
+            }
+        });
+    }
+
     // MESSAGE DELETE V12
     bot.on("messageDelete", message => {
         if (message.author.bot === true) return
@@ -115,7 +165,10 @@ ${message.attachments.map(x => x.proxyURL)}
         if (message && message.member && typeof message.member.guild === "object") {
             send(bot, message.member.guild, options, embed, "messageDelete")
         } else {
-            console.error(`Module: ${description.name} | messageDelete - ERROR - member guild id couldn't be retrieved`)
+            console.error(`
+            Module: $ {
+                description.name
+            } | messageDelete - ERROR - member guild id couldn 't be retrieved`)
             console.error("author", message.author)
             console.error("member", message.member)
             console.error("content", message.content)
@@ -130,8 +183,7 @@ ${message.attachments.map(x => x.proxyURL)}
 
         if (oldMessage.content === newMessage.content) return
         var embed = {
-            description:
-`
+            description: `
 **Author : ** <@${newMessage.member.user.id}> - *${newMessage.member.user.tag}*
 **Date : ** ${newMessage.createdAt}
 **Channel : ** <#${newMessage.channel.id}> - *${newMessage.channel.name}*
@@ -181,33 +233,65 @@ ${newMessage.content.replace(/`/g, "'")}
     })
 
     // USER LEFT V12
-    bot.on("guildMemberRemove", member => {
+    bot.on("guildMemberRemove", async member => {
         if (debugmode) console.log(`Module: ${description.name} | guildMemberRemove triggered`)
-        var embed = {
-            description: `<@${member.user.id}> - *${member.user.id}*`,
-            url: member.user.displayAvatarURL(),
-            color: 16711680,
-            timestamp: new Date(),
-            footer: {
-                text: `${member.nickname || member.user.username}`
-            },
-            thumbnail: {
-                url: member.user.displayAvatarURL()
-            },
-            author: {
-                name: `USER LEFT : ${member.user.tag}`,
-                icon_url: "https://cdn.discordapp.com/emojis/435119363595436042.png"
-            },
-            fields: [{
-                name: "Nickname",
-                value: `**${member.nickname || member.user.username}**`,
-                inline: true
-            }]
+        await sleep(5000)
+        var embed = await KickCheck(member).then(MEMBER_KICK_INFO => {
+            if (MEMBER_KICK_INFO) {
+                // User was kicked
+                return {
+                    description: `<@${member.user.id}> - *${member.user.id}*`,
+                    url: member.user.displayAvatarURL(),
+                    color: 16748544,
+                    timestamp: new Date(),
+                    footer: {
+                        text: `${member.nickname || member.user.username}`
+                    },
+                    thumbnail: {
+                        url: member.user.displayAvatarURL()
+                    },
+                    author: {
+                        name: `USER KICKED : ${member.user.tag} 
+BY: ${MEMBER_KICK_INFO.kickedby} 
+REASON: ${MEMBER_KICK_INFO.reason}`,
+                        icon_url: "https://cdn.discordapp.com/emojis/435119363595436042.png"
+                    },
+                    fields: [{
+                        name: "Nickname",
+                        value: `**${member.nickname || member.user.username}**`,
+                        inline: true
+                    }]
+                }
+            }
+        });
+        if ( typeof embed === "undefined") {
+            // User was not kicked
+            embed = {
+                description: `<@${member.user.id}> - *${member.user.id}*`,
+                url: member.user.displayAvatarURL(),
+                color: 16711680,
+                timestamp: new Date(),
+                footer: {
+                    text: `${member.nickname || member.user.username}`
+                },
+                thumbnail: {
+                    url: member.user.displayAvatarURL()
+                },
+                author: {
+                    name: `USER LEFT : ${member.user.tag}`,
+                    icon_url: "https://cdn.discordapp.com/emojis/435119363595436042.png"
+                },
+                fields: [{
+                    name: "Nickname",
+                    value: `**${member.nickname || member.user.username}**`,
+                    inline: true
+                }]
+            }
+
         }
         send(bot, member.guild, options, embed, "guildMemberRemove")
     })
-    // USER KICKED
-    // Not very doable
+
 
     // USER BANNED V12
     bot.on("guildBanAdd", (banguild, banuser) => {
@@ -257,7 +341,7 @@ ${newMessage.content.replace(/`/g, "'")}
     bot.on("guildMemberUpdate", (oldMember, newMember) => {
         if (debugmode) console.log(`Module: ${description.name} | guildMemberUpdate:nickname triggered`)
         if (oldMember.nickname !==
-             newMember.nickname) {
+            newMember.nickname) {
             var embed = {
                 description: `<@${newMember.user.id}> - *${newMember.user.id}*`,
                 url: newMember.user.displayAvatarURL(),
@@ -274,15 +358,15 @@ ${newMessage.content.replace(/`/g, "'")}
                     icon_url: "https://cdn.discordapp.com/emojis/435119397237948427.png"
                 },
                 fields: [{
-                    name: "Old Nickname",
-                    value: `**${oldMember.nickname || oldMember.user.username}**`,
-                    inline: true
-                },
-                {
-                    name: "New Nickname",
-                    value: `**${newMember.nickname || newMember.user.username}**`,
-                    inline: true
-                }
+                        name: "Old Nickname",
+                        value: `**${oldMember.nickname || oldMember.user.username}**`,
+                        inline: true
+                    },
+                    {
+                        name: "New Nickname",
+                        value: `**${newMember.nickname || newMember.user.username}**`,
+                        inline: true
+                    }
                 ]
             }
             send(bot, newMember.guild, options, embed, "guildMemberUpdate")
@@ -349,15 +433,15 @@ ${newMessage.content.replace(/`/g, "'")}
                         icon_url: "https://cdn.discordapp.com/emojis/435119397237948427.png"
                     },
                     fields: [{
-                        name: "ROLES REMOVED",
-                        value: `**${roleremoved} **`,
-                        inline: true
-                    },
-                    {
-                        name: "ROLES ADDED: ",
-                        value: `**${roleadded} **`,
-                        inline: true
-                    }
+                            name: "ROLES REMOVED",
+                            value: `**${roleremoved} **`,
+                            inline: true
+                        },
+                        {
+                            name: "ROLES ADDED: ",
+                            value: `**${roleadded} **`,
+                            inline: true
+                        }
                     ]
                 }
                 send(bot, newMember.guild, options, embed, "guildMemberUpdate")
@@ -400,15 +484,15 @@ ${newMessage.content.replace(/`/g, "'")}
                                 icon_url: "https://cdn.discordapp.com/emojis/435119402279763968.png"
                             },
                             fields: [{
-                                name: "Old Username",
-                                value: `**${oldUser.username}**`,
-                                inline: true
-                            },
-                            {
-                                name: "New Username",
-                                value: `**${newUser.username}**`,
-                                inline: true
-                            }
+                                    name: "Old Username",
+                                    value: `**${oldUser.username}**`,
+                                    inline: true
+                                },
+                                {
+                                    name: "New Username",
+                                    value: `**${newUser.username}**`,
+                                    inline: true
+                                }
                             ]
                         }
                     }
@@ -433,15 +517,15 @@ ${newMessage.content.replace(/`/g, "'")}
                                 icon_url: "https://cdn.discordapp.com/emojis/435119390078271488.png"
                             },
                             fields: [{
-                                name: "Old Discriminator",
-                                value: `**${oldUser.discriminator}**`,
-                                inline: true
-                            },
-                            {
-                                name: "New Discriminator",
-                                value: `**${newUser.discriminator}**`,
-                                inline: true
-                            }
+                                    name: "Old Discriminator",
+                                    value: `**${oldUser.discriminator}**`,
+                                    inline: true
+                                },
+                                {
+                                    name: "New Discriminator",
+                                    value: `**${newUser.discriminator}**`,
+                                    inline: true
+                                }
                             ]
                         }
                     }
@@ -486,7 +570,7 @@ ${newMessage.content.replace(/`/g, "'")}
     // CHANNEL JOIN LEAVE SWITCH V12
     bot.on("voiceStateUpdate", (oldState, newState) => {
         if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate triggered`)
-        if (oldState.channel === null && newState.channel === null) return; 
+        if (oldState.channel === null && newState.channel === null) return;
         var oldChannelName
         var newChannelName
         var embed
@@ -594,15 +678,15 @@ ${newMessage.content.replace(/`/g, "'")}
                         icon_url: "https://cdn.discordapp.com/emojis/435440286559371265.png"
                     },
                     fields: [{
-                        name: "Left channel",
-                        value: `${oldChannelName}`,
-                        inline: true
-                    },
-                    {
-                        name: "Joined channel",
-                        value: `${newChannelName}`,
-                        inline: true
-                    }
+                            name: "Left channel",
+                            value: `${oldChannelName}`,
+                            inline: true
+                        },
+                        {
+                            name: "Joined channel",
+                            value: `${newChannelName}`,
+                            inline: true
+                        }
                     ]
                 }
             }
@@ -617,7 +701,7 @@ ${newMessage.content.replace(/`/g, "'")}
 
 
     // SEND FUNCTION V12
-    function send (bot, guild, options, msg, movement) {
+    function send(bot, guild, options, msg, movement) {
         let embed = ""
 
         if (debugmode) console.log(`Module: ${description.name} | send - configured options:`, options)
@@ -654,8 +738,8 @@ ${newMessage.content.replace(/`/g, "'")}
                         if (channel.permissionsFor(bot.user).has("EMBED_LINKS")) {
                             embed = msg
                             channel.send({
-                                embed
-                            })
+                                    embed
+                                })
                                 .catch(console.error)
                         } else {
                             console.log(`${description.name} -> The Bot doesn't have the permission EMBED_LINKS to the configured channel "${channelname}" on server "${guild.name}" (${guild.id})`)
@@ -675,4 +759,6 @@ ${newMessage.content.replace(/`/g, "'")}
             // console.log(`AuditLog: No channel option for event ${movement} on server "${guild.name}" (${guild.id})`);
         }
     }
+
+
 }
