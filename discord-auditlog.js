@@ -2,6 +2,7 @@
 Simple Discord.js module to log member-related event
 Authors: Flisher et Patrix
 Other Contibutors: 
+2.4.1 - Adding Ting-c fix on deleted message
 2.4.0 - Adding Kick Detection Capability! (Huge thanks to DarylJG94)
 2.2.5 - Improved README.md format (OwenPotent)  
 
@@ -15,7 +16,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.4.0"
+        version: "2.4.1"
     }
 
     const eventtype = {
