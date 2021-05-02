@@ -129,6 +129,7 @@ module.exports = function (bot, options) {
 
     // MESSAGE DELETE V12
     bot.on("messageDelete", message => {
+        if (!message) return
         if (message.author.bot === true) return
         if (message.channel.type !== "text") return
         if (debugmode) console.log(`Module: ${description.name} | messageDelete triggered`)
