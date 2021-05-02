@@ -109,9 +109,9 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
-2.4.1 - Adding Ting-c fix on deleted message
-2.4.0 - Adding Experimental Kick Detection Capability, improvement coming shortly! (Huge thanks to DarylJG94)
-2.3.2 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.
+2.4.2 - Adding Ting-c fix on deleted message  
+2.4.0 - Adding Experimental Kick Detection Capability, improvement coming shortly! (Huge thanks to DarylJG94)  
+2.3.2 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.  
 2.2.5 - Improved README.md format (OwenPotent)  
 2.2.3 - Added ability to use channel ID instead of channel name (it check name, then id if name isn`t found)  
 2.2.2 - Initial commit to GitHub  
