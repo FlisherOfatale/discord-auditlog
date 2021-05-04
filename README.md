@@ -109,6 +109,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
+2.4.3 - Adding more fix for deleted message  
 2.4.2 - Adding Ting-c fix on deleted message  
 2.4.0 - Adding Experimental Kick Detection Capability, improvement coming shortly! (Huge thanks to DarylJG94)  
 2.3.2 - Hotfix to prevent crashes related to new Stage Channel.  Require DiscordJS 12.5.2.  Will be improved once DiscordJS fully support these channel.  

@@ -16,7 +16,7 @@ module.exports = function (bot, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.4.2"
+        version: "2.4.3"
     }
 
     const eventtype = {
@@ -131,8 +131,8 @@ module.exports = function (bot, options) {
     // MESSAGE DELETE V12
     bot.on("messageDelete", message => {
         if (!message) return
-        if (message.author.bot === true) return
-        if (message.channel.type !== "text") return
+        if (message.author && message.author.bot === true) return
+        if (message.channel && message.channel.type !== "text") return
         if (debugmode) console.log(`Module: ${description.name} | messageDelete triggered`)
         var embed = {
             description: `
