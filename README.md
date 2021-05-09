@@ -109,6 +109,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
+2.4.4 - Adding more fix for deleted message  
 2.4.3 - Adding more fix for deleted message  
 2.4.2 - Adding Ting-c fix on deleted message  
 2.4.0 - Adding Experimental Kick Detection Capability, improvement coming shortly! (Huge thanks to DarylJG94)  
