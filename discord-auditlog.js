@@ -98,7 +98,7 @@ module.exports = function (bot, options) {
 
                 // If No Result is found return a promise false
                 if (!AuditLogFetch) return resolve(false);
-                
+
                 // TODO: Check more than 1 entry, iteratie trought result to check if it was a kick.
                 const FirstEntry = AuditLogFetch.entries.first();
 
@@ -131,25 +131,25 @@ module.exports = function (bot, options) {
     // MESSAGE DELETE V12
     bot.on("messageDelete", message => {
         if (!message || message.partial) return
-        if (typeof message.author === "undefined" ) return
+        if (typeof message.author === "undefined") return
         if (message.author && message.author.bot === true) return
         if (message.channel && message.channel.type !== "text") return
         if (debugmode) console.log(`Module: ${description.name} | messageDelete triggered`)
         var embed = {
             description: `
-**Author : ** <@${message.author.id}> - *${message.author.tag}*
-**Date : ** ${message.createdAt}
-**Channel : ** <#${message.channel.id}> - *${message.channel.name}*
+            **Author : ** <@${message.author.id}> - *${message.author.tag}*
+            **Date : ** ${message.createdAt}
+            **Channel : ** <#${message.channel.id}> - *${message.channel.name}*
 
-**Deleted Message : **
-\`\`\`
-${message.content.replace(/`/g, "'")}
-\`\`\`
+            **Deleted Message : **
+            \`\`\`
+            ${message.content.replace(/`/g, "'")}
+            \`\`\`
 
-**Attachment URL : **
-${message.attachments.map(x => x.proxyURL)}
+            **Attachment URL : **
+            ${message.attachments.map(x => x.proxyURL)}
 
-`,
+            `,
             image: {
                 url: message.attachments.map(x => x.proxyURL)[0]
             },
@@ -186,7 +186,7 @@ ${message.attachments.map(x => x.proxyURL)}
 
         if (oldMessage.content === newMessage.content) return
         var embed = {
-            description: `
+            _description: `
 **Author : ** <@${newMessage.member.user.id}> - *${newMessage.member.user.tag}*
 **Date : ** ${newMessage.createdAt}
 **Channel : ** <#${newMessage.channel.id}> - *${newMessage.channel.name}*
@@ -200,6 +200,12 @@ ${oldMessage.content.replace(/`/g, "'")}
 ${newMessage.content.replace(/`/g, "'")}
 \`\`\`
 `,
+            get description() {
+                return this._description
+            },
+            set description(value) {
+                this._description = value
+            },
             color: 16737792,
             timestamp: new Date(),
             footer: {
@@ -267,7 +273,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                 }
             }
         });
-        if ( typeof embed === "undefined") {
+        if (typeof embed === "undefined") {
             // User was not kicked
             embed = {
                 description: `<@${member.user.id}> - *${member.user.id}*`,
@@ -462,7 +468,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         var avatarChangedMsg = null
 
         // search the member from all guilds, since the userUpdate event doesn't provide guild information as it is a global event.
-        bot.guilds.cache.forEach(function (guild, guildid) {
+        bot.guilds.cache.forEach(function (guild) {
             guild.members.cache.forEach(function (member, memberid) {
                 if (newUser.id === memberid) {
                     // var member = bot.guilds.get(guildid).members.get(member.id)
