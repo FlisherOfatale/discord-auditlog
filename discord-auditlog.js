@@ -11,7 +11,7 @@ module.exports = function (client, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "3.0.1"
+        version: "3.0.3"
     }
 
     const eventtype = {
@@ -31,12 +31,10 @@ module.exports = function (client, options) {
 
 	const debug = false
     if (options && options.debugmode === true) debug = true
-
-    console.log(`Module: ${description.name} | Loaded - version ${description.version} from ("${description.filename}")`)
     const DiscordJSversion = require("discord.js").version.substring(0, 2)
 
-    if (DiscordJSversion === '11') console.error("This version of discord-Streaming only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v11\" to install an older version")
-    if (DiscordJSversion === '12') console.error("This version of discord-Streaming only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v12\" to install an older version")
+    if (DiscordJSversion === '11') console.error("This version of discord-auditlog only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v11\" to install an older version")
+    if (DiscordJSversion === '12') console.error("This version of discord-auditlog only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v12\" to install an older version")
     if (DiscordJSversion !== '13') return
 
     // Check that required Gateway Intention
@@ -114,10 +112,10 @@ module.exports = function (client, options) {
                     limit: 1,
                     type: 'MEMBER_KICK',
                 });
-                console.log(AuditLogFetch)
+                // console.log(AuditLogFetch)
 
                 // If No Result is found return a promise false
-                if (!AuditLogFetch) return resolve(false);
+                if (!AuditLogFetch || AuditLogFetch.entries.size === 0 ) return resolve(false);
 
                 // TODO: Check more than 1 entry, iteratie trought result to check if it was a kick.
                 const FirstEntry = AuditLogFetch.entries.first();
@@ -408,7 +406,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                     }
                 ]
             }
-            console.log(embed)
+            // console.log(embed)
             send(client, newMember.guild, options, embed, "guildMemberUpdate")
         }
     })
@@ -431,7 +429,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         if (typeof options.excludedroles === "undefined") options.excludedroles = new Array([])
         if (typeof options.trackroles === "undefined") options.trackroles = false
 
-        console.log(options.trackroles)
+        // console.log(options.trackroles)
 
         if (options.trackroles !== false) {
             const oldMemberRoles = oldMember.roles.cache

@@ -14,8 +14,8 @@ If yu want to test while Discord.js v13 isn't released yet, you can use with `np
 
 ##Discord.js v11 and v12 compatibility 
 You can install DiscordJS v11 and v12 version using tag.  These aren't maintained anymore.
-V11: `npm install discord-playing@discord.js-v11`.
-V12: `npm install discord-playing@discord.js-v12`.
+V11: `npm install discord-auditlog@discord.js-v11`  
+V12: `npm install discord-auditlog@discord.js-v12`  
 
 
 ## Installation
@@ -116,6 +116,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
+3.0.3 - cleaned v13 build
 3.0.1 - Initial release for DiscordJS v13   
 2.4.5 - Adding more fix for deleted message   
 2.4.4 - Adding more fix for deleted message  

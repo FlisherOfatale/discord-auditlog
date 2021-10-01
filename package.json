@@ -1,6 +1,6 @@
 {
   "name": "discord-auditlog",
-  "version": "3.0.1",
+  "version": "3.0.3",
   "description": "Simple Discord.js v13 Module that send somne custom audit logs to specifics channel",
   "main": "discord-auditlog.js",
   "scripts": {
