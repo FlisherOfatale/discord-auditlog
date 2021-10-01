@@ -116,7 +116,7 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
-3.0.0 - Initial release for DiscordJS v13   
+3.0.1 - Initial release for DiscordJS v13   
 2.4.5 - Adding more fix for deleted message   
 2.4.4 - Adding more fix for deleted message  
 2.4.3 - Adding more fix for deleted message  

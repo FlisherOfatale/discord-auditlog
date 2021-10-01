@@ -11,7 +11,7 @@ module.exports = function (client, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "3.0.0"
+        version: "3.0.1"
     }
 
     const eventtype = {
@@ -29,7 +29,7 @@ module.exports = function (client, options) {
     }
     console.log(`Module: ${description.name} | Loaded version ${description.version} from ("${description.filename}")`)
 
-    let debug = true
+	const debug = false
     if (options && options.debugmode === true) debug = true
 
     console.log(`Module: ${description.name} | Loaded - version ${description.version} from ("${description.filename}")`)

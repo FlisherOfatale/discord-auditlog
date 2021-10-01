@@ -1,12 +1,10 @@
 {
   "name": "discord-auditlog",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Simple Discord.js v13 Module that send somne custom audit logs to specifics channel",
   "main": "discord-auditlog.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
   },
   "keywords": [
     "Discord",
@@ -16,7 +14,7 @@
   "author": "Flisher",
   "license": "ISC",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/FlisherOfatale/discord-auditlog.git"
+    "type": "git",
+    "url": "https://github.com/FlisherOfatale/discord-auditlog.git"
   }
 }
