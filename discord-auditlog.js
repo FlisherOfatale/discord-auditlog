@@ -1,22 +1,17 @@
 /*
 Simple Discord.js module to log member-related event
-Authors: Flisher et Patrix
+Authors: Flisher
 Other Contibutors: 
-2.4.2 - Adding Ting-c fix on deleted message
-2.4.0 - Adding Kick Detection Capability! (Huge thanks to DarylJG94)
-2.2.5 - Improved README.md format (OwenPotent)  
+ DarylJG#9825
 
-Todo:
-Add 2000 character handlings on msg related event
-
-*/
+ */
 
 
-module.exports = function (bot, options) {
+module.exports = function (client, options) {
     const description = {
         name: "discord-auditlog",
         filename: "discord-auditlog.js",
-        version: "2.4.5"
+        version: "3.0.0"
     }
 
     const eventtype = {
@@ -34,12 +29,36 @@ module.exports = function (bot, options) {
     }
     console.log(`Module: ${description.name} | Loaded version ${description.version} from ("${description.filename}")`)
 
-    let debugmode = false
-    if (options && options.debugmode === true) debugmode = true
+    let debug = true
+    if (options && options.debugmode === true) debug = true
 
-    const DiscordJSversion = require("discord.js").version
-    if (DiscordJSversion.substring(0, 2) !== "12") console.error("This version of discord-lobby only run on DiscordJS V12 and up, please run \"npm i discord-auditlog@discord.js-v11\" to install an older version")
-    if (DiscordJSversion.substring(0, 2) !== "12") return
+    console.log(`Module: ${description.name} | Loaded - version ${description.version} from ("${description.filename}")`)
+    const DiscordJSversion = require("discord.js").version.substring(0, 2)
+
+    if (DiscordJSversion === '11') console.error("This version of discord-Streaming only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v11\" to install an older version")
+    if (DiscordJSversion === '12') console.error("This version of discord-Streaming only run on DiscordJS V13 and up, please run \"npm i discord-playing@discord.js-v12\" to install an older version")
+    if (DiscordJSversion !== '13') return
+
+    // Check that required Gateway Intention
+    const {
+        Intents
+    } = require('discord.js');
+    const liveIntent = new Intents(client.options.intents)
+    const requiredIntent = ['GUILDS', 'GUILD_MEMBERS', 'GUILD_BANS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES']
+    const gotAllIntent = liveIntent.has(requiredIntent)
+
+    if (gotAllIntent) {
+        console.log(`Module: ${description.name} | Version ${description.version} initialized")`)
+    } else {
+        console.log(`Module: ${description.name} | Version ${description.version} NOT initialized due to the following reasons:")`)
+        for (let i in requiredIntent) {
+            let checkedIntent = requiredIntent[i]
+            if (debug) console.log(`Module: ${description.name} | DEBUG | liveIntent: ${liveIntent}`)
+            if (!liveIntent.has(requiredIntent[i])) {
+                console.log(`Module: ${description.name} | Missing Gateway Intent ${requiredIntent[i]}`)
+            }
+        }
+    }
 
     // Event Handlers
     /*
@@ -72,7 +91,7 @@ module.exports = function (bot, options) {
         });
     }
 
-    KickCheck = async function (member) {
+    KickCheck = async function (member) { // DiscordJS V13
 
         /**
          *  Checks if the user has left or was kicked on their own decision 
@@ -87,18 +106,19 @@ module.exports = function (bot, options) {
                 let guild = member.guild;
 
                 // Throw an error and reject the promise if the bot does not have sufficient permission
-                if (!member.guild.me.hasPermission('VIEW_AUDIT_LOG')) console.error `Discord-AuditLog - Missing Permission To View Audit Log`;
-                if (!member.guild.me.hasPermission('VIEW_AUDIT_LOG')) return resolve(false);
+                if (!guild.me.permissions.has('VIEW_AUDIT_LOG')) console.error `Discord-AuditLog - Missing Permission To View Audit Log`;
+                if (!guild.me.permissions.has('VIEW_AUDIT_LOG')) return resolve(false);
 
                 // Grab the last audit log entry for kicks
                 const AuditLogFetch = await guild.fetchAuditLogs({
                     limit: 1,
                     type: 'MEMBER_KICK',
                 });
+                console.log(AuditLogFetch)
 
                 // If No Result is found return a promise false
                 if (!AuditLogFetch) return resolve(false);
-                
+
                 // TODO: Check more than 1 entry, iteratie trought result to check if it was a kick.
                 const FirstEntry = AuditLogFetch.entries.first();
 
@@ -128,13 +148,24 @@ module.exports = function (bot, options) {
         });
     }
 
-    // MESSAGE DELETE V12
-    bot.on("messageDelete", message => {
+    // MESSAGE DELETE V13
+    client.on("messageDelete", message => {
+        if (debug) console.log(`Module: ${description.name} | DEBUG | messageDelete triggered`)
         if (!message || message.partial) return
-        if (typeof message.author === "undefined" ) return
+        if (typeof message.author === "undefined") return
         if (message.author && message.author.bot === true) return
-        if (message.channel && message.channel.type !== "text") return
-        if (debugmode) console.log(`Module: ${description.name} | messageDelete triggered`)
+
+        // validate if it's from a guild
+        let guildid = message.guildId || false
+        if (!guildid) return
+
+        if (message.author && message.author.bot === true) return
+
+        let guild = client.guilds.cache.find(val => val.id === guildid)
+        let channelid = message.channelId || false
+        if (!channelid) return
+
+        if (message.channel && message.channel.type !== "GUILD_TEXT") return
         var embed = {
             description: `
 **Author : ** <@${message.author.id}> - *${message.author.tag}*
@@ -166,7 +197,7 @@ ${message.attachments.map(x => x.proxyURL)}
             }
         }
         if (message && message.member && typeof message.member.guild === "object") {
-            send(bot, message.member.guild, options, embed, "messageDelete")
+            send(client, message.member.guild, options, embed, "messageDelete")
         } else {
             console.error(`
             Module: $ {
@@ -178,11 +209,13 @@ ${message.attachments.map(x => x.proxyURL)}
         }
     })
 
-    // MESSAGE UPDATE V12
-    bot.on("messageUpdate", (oldMessage, newMessage) => {
+    // MESSAGE UPDATE V13
+    client.on("messageUpdate", (oldMessage, newMessage) => {
+        if (debug) console.log(`Module: ${description.name} | DEBUG | messageUpdate triggered`)
+
         if (oldMessage.author.bot === true) return
-        if (oldMessage.channel.type !== "text") return
-        if (newMessage.channel.type !== "text") return
+        if (oldMessage.channel.type !== "GUILD_TEXT") return
+        if (newMessage.channel.type !== "GUILD_TEXT") return
 
         if (oldMessage.content === newMessage.content) return
         var embed = {
@@ -210,12 +243,12 @@ ${newMessage.content.replace(/`/g, "'")}
                 icon_url: "https://cdn.discordapp.com/emojis/619328813381320735.png"
             }
         }
-        send(bot, newMessage.member.guild, options, embed, "messageDelete")
+        send(client, newMessage.member.guild, options, embed, "messageDelete")
     })
 
-    // USER JOINED V12
-    bot.on("guildMemberAdd", member => {
-        if (debugmode) console.log(`Module: ${description.name} | guildMemberAdd triggered`)
+    // USER JOINED V13
+    client.on("guildMemberAdd", member => {
+        if (debug) console.log(`Module: ${description.name} | guildMemberAdd triggered`)
         var embed = {
             description: `<@${member.user.id}> - *${member.user.id}*\nUser Created on: ${new Date(member.user.createdTimestamp).toDateString()}`,
             url: member.user.displayAvatarURL(),
@@ -232,12 +265,12 @@ ${newMessage.content.replace(/`/g, "'")}
                 icon_url: "https://cdn.discordapp.com/emojis/435119354867220511.png"
             }
         }
-        send(bot, member.guild, options, embed, "guildMemberAdd")
+        send(client, member.guild, options, embed, "guildMemberAdd")
     })
 
-    // USER LEFT V12
-    bot.on("guildMemberRemove", async member => {
-        if (debugmode) console.log(`Module: ${description.name} | guildMemberRemove triggered`)
+    // USER LEFT V13
+    client.on("guildMemberRemove", async member => {
+        if (debug) console.log(`Module: ${description.name} | guildMemberRemove triggered`)
         await sleep(5000)
         var embed = await KickCheck(member).then(MEMBER_KICK_INFO => {
             if (MEMBER_KICK_INFO) {
@@ -267,7 +300,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                 }
             }
         });
-        if ( typeof embed === "undefined") {
+        if (typeof embed === "undefined") {
             // User was not kicked
             embed = {
                 description: `<@${member.user.id}> - *${member.user.id}*`,
@@ -292,13 +325,14 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
             }
 
         }
-        send(bot, member.guild, options, embed, "guildMemberRemove")
+        send(client, member.guild, options, embed, "guildMemberRemove")
     })
 
+    // USER BANNED V13
+    client.on("guildBanAdd", (guildban) => {
+        if (debug) console.log(`Module: ${description.name} | guildBanAdd triggered`)
+        let banuser = guildban.user
 
-    // USER BANNED V12
-    bot.on("guildBanAdd", (banguild, banuser) => {
-        if (debugmode) console.log(`Module: ${description.name} | guildBanAdd triggered`)
         var embed = {
             description: `<@${banuser.id}> - *${banuser.id}*`,
             url: banuser.displayAvatarURL(),
@@ -315,12 +349,13 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                 icon_url: "https://cdn.discordapp.com/emojis/435119375138422811.png"
             }
         }
-        send(bot, banguild, options, embed, "guildBanAdd")
+        send(client, guildban.guild, options, embed, "guildBanAdd")
     })
 
-    // USER UNBANNED V12
-    bot.on("guildBanRemove", (banguild, banuser) => {
-        if (debugmode) console.log(`Module: ${description.name} | guildBanRemove triggered`)
+    // USER UNBANNED V13
+    client.on("guildBanRemove", (guildban) => {
+        if (debug) console.log(`Module: ${description.name} | guildBanRemove triggered`)
+        let banuser = guildban.user
         var embed = {
             description: `<@${banuser.id}> - *${banuser.id}*`,
             url: banuser.displayAvatarURL(),
@@ -337,14 +372,15 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                 icon_url: "https://cdn.discordapp.com/emojis/435462140900409344.png"
             }
         }
-        send(bot, banguild, options, embed, "guildBanRemove")
+        send(client, guildban.guild, options, embed, "guildBanRemove")
     })
 
-    // USER NICKNAME UPDATE V12
-    bot.on("guildMemberUpdate", (oldMember, newMember) => {
-        if (debugmode) console.log(`Module: ${description.name} | guildMemberUpdate:nickname triggered`)
+    // USER NICKNAME UPDATE V13
+    client.on("guildMemberUpdate", (oldMember, newMember) => {
+        if (debug) console.log(`Module: ${description.name} | guildMemberUpdate:nickname triggered`)
         if (oldMember.nickname !==
             newMember.nickname) {
+            if (debug) console.log(`Module: ${description.name} | guildMemberUpdate:nickname validated`)
             var embed = {
                 description: `<@${newMember.user.id}> - *${newMember.user.id}*`,
                 url: newMember.user.displayAvatarURL(),
@@ -372,14 +408,15 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                     }
                 ]
             }
-            send(bot, newMember.guild, options, embed, "guildMemberUpdate")
+            console.log(embed)
+            send(client, newMember.guild, options, embed, "guildMemberUpdate")
         }
     })
 
 
-    // MEMBER ROLE (Groups) UPDATE V12
-    bot.on("guildMemberUpdate", (oldMember, newMember) => {
-        if (debugmode) console.log(`Module: ${description.name} | guildMemberUpdate:roles triggered`)
+    // MEMBER ROLE (Groups) UPDATE V13
+    client.on("guildMemberUpdate", (oldMember, newMember) => {
+        if (debug) console.log(`Module: ${description.name} | guildMemberUpdate:roles triggered`)
 
         // Initialize option if empty
         if (!options) {
@@ -393,33 +430,35 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         // Add default empty list
         if (typeof options.excludedroles === "undefined") options.excludedroles = new Array([])
         if (typeof options.trackroles === "undefined") options.trackroles = false
+
+        console.log(options.trackroles)
+
         if (options.trackroles !== false) {
-            const oldMemberRoles = oldMember.roles.cache.keyArray()
-            const newMemberRoles = newMember.roles.cache.keyArray()
+            const oldMemberRoles = oldMember.roles.cache
+            const newMemberRoles = newMember.roles.cache
 
+            let rolechanged = newMemberRoles.difference(oldMemberRoles)
+            options.excludedroles.forEach(function (key) {
+                rolechanged.delete(key)
+            })
 
-            // Check inspired by https://medium.com/@alvaro.saburido/set-theory-for-arrays-in-es6-eb2f20a61848
-            const oldRoles = oldMemberRoles.filter(x => !options.excludedroles.includes(x)).filter(x => !newMemberRoles.includes(x))
-            const newRoles = newMemberRoles.filter(x => !options.excludedroles.includes(x)).filter(x => !oldMemberRoles.includes(x))
+            if (rolechanged.size !== 0) {
+                if (debug) console.log(`Module: ${description.name} | guildMemberUpdate:rolechanged triggered`)
 
-            const rolechanged = (newRoles.length || oldRoles.length)
+                // const oldRoles = oldMemberRoles.filter(x => !options.excludedroles.includes(x)).filter(x => !newMemberRoles.cache.includes(x))
+                // const newRoles = newMemberRoles.filter(x => !options.excludedroles.includes(x)).filter(x => !oldMemberRoles.cache.includes(x))
 
-            if (rolechanged) {
                 let roleadded = ""
-                if (newRoles.length > 0) {
-                    for (let i = 0; i < newRoles.length; i++) {
-                        if (i > 0) roleadded += ", "
-                        roleadded += `<@&${newRoles[i]}>`
-                    }
-                }
-
                 let roleremoved = ""
-                if (oldRoles.length > 0) {
-                    for (let i = 0; i < oldRoles.length; i++) {
-                        if (i > 0) roleremoved += ", "
-                        roleremoved += `<@&${oldRoles[i]}>`
+
+                rolechanged.forEach(function (key) {
+                    if (newMemberRoles.has(key.id)) {
+                        roleadded += `<@&${key.id}>`
+                    } else {
+                        roleremoved += `<@&${key.id}>`
                     }
-                }
+                })
+
                 var embed = {
                     description: `<@${newMember.user.id}> - *${newMember.user.id}*`,
                     url: newMember.user.displayAvatarURL(),
@@ -447,14 +486,14 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                         }
                     ]
                 }
-                send(bot, newMember.guild, options, embed, "guildMemberUpdate")
+                send(client, newMember.guild, options, embed, "guildMemberUpdate")
             }
         }
     })
 
-    // USER UPDATE AVATAR, USERNAME, DISCRIMINATOR V12
-    bot.on("userUpdate", (oldUser, newUser) => {
-        if (debugmode) console.log(`Module: ${description.name} | userUpdate triggered`)
+    // USER UPDATE AVATAR, USERNAME, DISCRIMINATOR V13
+    client.on("userUpdate", (oldUser, newUser) => {
+        if (debug) console.log(`Module: ${description.name} | userUpdate triggered`)
 
         // Log quand le user change de username (et possiblement discriminator)
         var usernameChangedMsg = null
@@ -462,14 +501,14 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         var avatarChangedMsg = null
 
         // search the member from all guilds, since the userUpdate event doesn't provide guild information as it is a global event.
-        bot.guilds.cache.forEach(function (guild, guildid) {
+        client.guilds.cache.forEach(function (guild, guildid) {
             guild.members.cache.forEach(function (member, memberid) {
                 if (newUser.id === memberid) {
                     // var member = bot.guilds.get(guildid).members.get(member.id)
 
-                    // USERNAME CHANGED V12
+                    // USERNAME CHANGED V13
                     if (oldUser.username !== newUser.username) {
-                        if (debugmode) console.log(`Module: ${description.name} | userUpdate:USERNAME triggered`)
+                        if (debug) console.log(`Module: ${description.name} | userUpdate:USERNAME triggered`)
 
                         usernameChangedMsg = {
                             description: `<@${newUser.id}> - *${newUser.id}*`,
@@ -500,9 +539,9 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                         }
                     }
 
-                    // DISCRIMINATOR CHANGED V12
+                    // DISCRIMINATOR CHANGED V13
                     if (oldUser.discriminator !== newUser.discriminator) {
-                        if (debugmode) console.log(`Module: ${description.name} | userUpdate:DISCRIMINATOR triggered`)
+                        if (debug) console.log(`Module: ${description.name} | userUpdate:DISCRIMINATOR triggered`)
 
                         discriminatorChangedMsg = {
                             description: `<@${newUser.id}> - *${newUser.id}*`,
@@ -533,9 +572,9 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                         }
                     }
 
-                    // AVATAR CHANGED V12
+                    // AVATAR CHANGED V13
                     if (oldUser.avatar !== newUser.avatar) {
-                        if (debugmode) console.log(`Module: ${description.name} | userUpdate:AVATAR triggered`)
+                        if (debug) console.log(`Module: ${description.name} | userUpdate:AVATAR triggered`)
 
                         avatarChangedMsg = {
                             description: `<@${newUser.id}> - *${newUser.id}*`,
@@ -562,18 +601,26 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
                         }
                     }
 
-                    if (usernameChangedMsg) send(bot, guild, options, usernameChangedMsg, "usernameChangedMsg")
-                    if (discriminatorChangedMsg) send(bot, guild, options, discriminatorChangedMsg, "discriminatorChangedMsg")
-                    if (avatarChangedMsg) send(bot, guild, options, avatarChangedMsg, "avatarChangedMsg")
+                    if (usernameChangedMsg) send(client, guild, options, usernameChangedMsg, "usernameChangedMsg")
+                    if (discriminatorChangedMsg) send(client, guild, options, discriminatorChangedMsg, "discriminatorChangedMsg")
+                    if (avatarChangedMsg) send(client, guild, options, avatarChangedMsg, "avatarChangedMsg")
                 }
             })
         })
     })
 
-    // CHANNEL JOIN LEAVE SWITCH V12
-    bot.on("voiceStateUpdate", (oldState, newState) => {
-        if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate triggered`)
+    // CHANNEL JOIN LEAVE SWITCH V13
+    client.on("voiceStateUpdate", async (oldState, newState) => {
+        if (debug) console.log(`Module: ${description.name} | voiceStateUpdate triggered`)
+
+        let userid = oldState.id || newState.id
+        let guildid = oldState.guild.id || newState.guild.id
+        let guild = client.guilds.cache.find(val => val.id === guildid)
+        let author = guild.members.cache.find(val => val.id === userid)
+        if (author && author.user.bot === true) return
+
         if (oldState.channel === null && newState.channel === null) return;
+
         var oldChannelName
         var newChannelName
         var embed
@@ -584,23 +631,23 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         let oldchanelid = "unknown"
         if (oldState && oldState.channel && oldState.channel.parent && oldState.channel.parent.name) oldparentname = oldState.channel.parent.name
         if (oldState && oldState.channel && oldState.channel.name) oldchannelname = oldState.channel.name
-        if (oldState && oldState.channelID) oldchanelid = oldState.channelID
+        if (oldState && oldState.channelId) oldchanelid = oldState.channelId
 
         let newparentname = "unknown"
         let newchannelname = "unknown"
         let newchanelid = "unknown"
         if (newState && newState.channel && newState.channel.parent && newState.channel.parent.name) newparentname = newState.channel.parent.name
         if (newState && newState.channel && newState.channel.name) newchannelname = newState.channel.name
-        if (newState && newState.channelID) newchanelid = newState.channelID
+        if (newState && newState.channelId) newchanelid = newState.channelId
 
-        if (oldState.channelID && oldState.channel) {
+        if (oldState.channelId && oldState.channel) {
             if (typeof oldState.channel.parent !== "undefined") {
                 oldChannelName = `${oldparentname}\n\t**${oldchannelname}**\n*${oldchanelid}*`
             } else {
                 oldChannelName = `-\n\t**${oldparentname}**\n*${oldchanelid}*`
             }
         }
-        if (newState.channelID && newState.channel) {
+        if (newState.channelId && newState.channel) {
             if (typeof newState.channel.parent !== "undefined") {
                 newChannelName = `${newparentname}\n\t**${newchannelname}**\n*${newchanelid}*`
             } else {
@@ -608,9 +655,9 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
             }
         }
 
-        // JOINED V12
-        if (!oldState.channelID && newState.channelID && !oldState.channel && newState.channel) {
-            if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:JOINED triggered`)
+        // JOINED V13
+        if (!oldState.channelId && newState.channelId && !oldState.channel && newState.channel) {
+            if (debug) console.log(`Module: ${description.name} | voiceStateUpdate:JOINED triggered`)
             embed = {
                 description: `<@${newState.member.user.id}> - *${newState.member.user.id}*`,
                 url: newState.member.user.displayAvatarURL(),
@@ -634,9 +681,9 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         }
 
 
-        // LEFT V12
-        if (oldState.channelID && !newState.channelID && oldState.channel && !newState.channel) {
-            if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:LEFT triggered`)
+        // LEFT V13
+        if (oldState.channelId && !newState.channelId && oldState.channel && !newState.channel) {
+            if (debug) console.log(`Module: ${description.name} | voiceStateUpdate:LEFT triggered`)
             embed = {
                 url: newState.member.user.displayAvatarURL(),
                 color: 10040115,
@@ -659,11 +706,11 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         }
 
 
-        // SWITCH V12
-        if (oldState.channelID && newState.channelID && oldState.channel && newState.channel) {
+        // SWITCH V13
+        if (oldState.channelId && newState.channelId && oldState.channel && newState.channel) {
             // False positive check
-            if (oldState.channelID !== newState.channelID) {
-                if (debugmode) console.log(`Module: ${description.name} | voiceStateUpdate:SWITCH triggered`)
+            if (oldState.channelId !== newState.channelId) {
+                if (debug) console.log(`Module: ${description.name} | voiceStateUpdate:SWITCH triggered`)
 
                 embed = {
                     description: `<@${newState.member.user.id}> - *${newState.member.user.id}*`,
@@ -698,16 +745,16 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
 
         // SEND
         if (embed) {
-            send(bot, newState.guild, options, embed, "voiceStateUpdate")
+            send(client, newState.guild, options, embed, "voiceStateUpdate")
         }
     })
 
 
-    // SEND FUNCTION V12
-    function send(bot, guild, options, msg, movement) {
+    // SEND FUNCTION V13
+    function send(client, guild, options, msg, movement) {
         let embed = ""
 
-        if (debugmode) console.log(`Module: ${description.name} | send - configured options:`, options)
+        if (debug) console.log(`Module: ${description.name} | DEBUG | send`)
 
         // Initialize option if empty
         if (!options) {
@@ -719,7 +766,7 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
             options = options[guild.id]
         }
 
-        if (debugmode) console.log(`Module: ${description.name} | send - specifics options:`, options)
+        // if (debug) console.log(`Module: ${description.name} | send - specifics options:`, options)
 
         // Add default channel
         if (typeof options.auditlog === "undefined") options.auditlog = "audit-log"
@@ -728,20 +775,20 @@ REASON: ${MEMBER_KICK_INFO.reason}`,
         if (typeof options.voice === "undefined") options.voice = false
 
 
-        if (debugmode) console.log(`Module: ${description.name} | send - computed options:`, options)
+        // if (debug) console.log(`Module: ${description.name} | send - computed options:`, options)
 
         const channelname = (options[eventtype[movement]])
         if (channelname) {
             // define channel object
             const channel = guild.channels.cache.find(val => val.name === channelname) || guild.channels.cache.find(val => val.id === channelname)
             if (channel) {
-                if (channel.permissionsFor(bot.user).has("SEND_MESSAGES") && channel.permissionsFor(bot.user).has("SEND_MESSAGES")) {
+                if (channel.permissionsFor(client.user).has("SEND_MESSAGES") && channel.permissionsFor(client.user).has("SEND_MESSAGES")) {
                     if (typeof msg === "object") {
                         // Embed
-                        if (channel.permissionsFor(bot.user).has("EMBED_LINKS")) {
+                        if (channel.permissionsFor(client.user).has("EMBED_LINKS")) {
                             embed = msg
                             channel.send({
-                                    embed
+                                    embeds: [embed]
                                 })
                                 .catch(console.error)
                         } else {

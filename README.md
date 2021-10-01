@@ -1,15 +1,22 @@
 <p align="center"><a href="https://nodei.co/npm/discord-auditlog/"><img src="https://nodei.co/npm/discord-auditlog.png"></a></p>
 
 # discord-auditlog
-A simple Discord.js v12 Module that send join/leave/ban/unban and nickname/discriminator/username/avatar in custom channel.  
+A simple Discord.js v13 Module that send join/leave/ban/unban and nickname/discriminator/username/avatar in custom channel.  
 
 # Important note
 This package is originally release as an NPMJS package named "discord-auditlog".  
 It's available at (https://www.npmjs.com/package/discord-auditlog)  
 While I accept suggestion and contribution, I can't provide support or vouch for to other forks.  
 
-This module have been Updated for DiscordJS V12 (tested under V12.5.2)  
-If you are still running V11, please install the version 1.9.4: "npm i discord-auditlog@discord.js-v11"  
+##Discord.js v13 compatibility  
+Require the following Intents to be requested: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_BANS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES']
+If yu want to test while Discord.js v13 isn't released yet, you can use with `npm install discord-playing`  
+
+##Discord.js v11 and v12 compatibility 
+You can install DiscordJS v11 and v12 version using tag.  These aren't maintained anymore.
+V11: `npm install discord-playing@discord.js-v11`.
+V12: `npm install discord-playing@discord.js-v12`.
+
 
 ## Installation
 This module assumes you already have a basic [Discord.js](https://discord.js.org/#/) bot setup.  
@@ -109,7 +116,8 @@ Liens:  https://www.bucherons.ca, https://www.gardiensdulys.com, https://www.bar
 You can reach me via my Discord Development Server at https://discord.gg/Tmtjkwz  
 
 ### History:  
-2.4.5 - Adding more fix for deleted message  
+3.0.0 - Initial release for DiscordJS v13   
+2.4.5 - Adding more fix for deleted message   
 2.4.4 - Adding more fix for deleted message  
 2.4.3 - Adding more fix for deleted message  
 2.4.2 - Adding Ting-c fix on deleted message  
